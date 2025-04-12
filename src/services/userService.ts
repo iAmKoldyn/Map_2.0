@@ -1,56 +1,205 @@
-import { PrismaClient, Role } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { generateToken, generateRefreshToken } from '../utils/jwt';
+import { generateToken, generateRefreshToken, verifyToken } from '../utils/jwt';
+import { UserRole } from '../middleware/authMiddleware';
+import { prisma } from '../prisma';
+import type { PrismaClient } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 
-const prisma = new PrismaClient();
+const prismaClient = prisma as unknown as PrismaClient & {
+  user: {
+    create: (args: any) => Promise<any>;
+    findUnique: (args: any) => Promise<any>;
+  };
+};
 
 export class UserService {
-  async register(email: string, password: string, role: Role = Role.USER) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        role,
-      },
+  async register(email: string, password: string, role: UserRole = UserRole.USER) {
+    // Input validation
+    if (!email || !password) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Email and password are required'
+      });
+    }
+
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Invalid email format'
+      });
+    }
+
+    if (password.length < 8) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Password must be at least 8 characters long'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await prismaClient.user.findUnique({
+      where: { email },
     });
 
-    const token = generateToken({ userId: user.id, role: user.role });
-    const refreshToken = generateRefreshToken({ userId: user.id, role: user.role });
+    if (existingUser) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: 'User already exists'
+      });
+    }
 
-    return { user, token, refreshToken };
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await prismaClient.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          role,
+        },
+      });
+
+      const { token, refreshToken } = this.generateTokens(user);
+      return { user, token, refreshToken };
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to create user'
+      });
+    }
   }
 
   async login(email: string, password: string) {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      throw new Error('User not found');
+    if (!email || !password) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Email and password are required'
+      });
     }
 
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      throw new Error('Invalid password');
+    try {
+      const user = await prismaClient.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Invalid email or password'
+        });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid email or password'
+        });
+      }
+
+      const tokenPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role as UserRole
+      };
+
+      const token = generateToken(tokenPayload);
+      const refreshToken = generateRefreshToken(tokenPayload);
+
+      return { 
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role
+        },
+        token,
+        refreshToken
+      };
+    } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      console.error('Login error:', error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to login'
+      });
     }
-
-    const token = generateToken({ userId: user.id, role: user.role });
-    const refreshToken = generateRefreshToken({ userId: user.id, role: user.role });
-
-    return { user, token, refreshToken };
   }
 
   async refreshToken(refreshToken: string) {
+    if (!refreshToken) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Refresh token is required'
+      });
+    }
+
     try {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET!) as { userId: number; role: Role };
-      const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
-      
+      const payload = verifyToken(refreshToken);
+      const user = await prismaClient.user.findUnique({
+        where: { id: payload.id },
+      });
+
       if (!user) {
-        throw new Error('User not found');
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'User not found'
+        });
       }
 
-      const token = generateToken({ userId: user.id, role: user.role });
-      return { token };
+      const tokenPayload = {
+        id: user.id,
+        email: user.email,
+        role: user.role as UserRole
+      };
+
+      const token = generateToken(tokenPayload);
+      const newRefreshToken = generateRefreshToken(tokenPayload);
+
+      return { token, refreshToken: newRefreshToken };
     } catch (error) {
-      throw new Error('Invalid refresh token');
+      console.error('Refresh token error:', error);
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Invalid refresh token'
+      });
     }
+  }
+
+  async validateToken(token: string) {
+    try {
+      const payload = verifyToken(token);
+      const user = await prismaClient.user.findUnique({
+        where: { id: payload.id },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'User not found'
+        });
+      }
+
+      return { isValid: true, user };
+    } catch (error) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Invalid token'
+      });
+    }
+  }
+
+  private generateTokens(user: any) {
+    const tokenPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role as UserRole
+    };
+
+    const token = generateToken(tokenPayload);
+    const refreshToken = generateRefreshToken(tokenPayload);
+
+    return { token, refreshToken };
   }
 }

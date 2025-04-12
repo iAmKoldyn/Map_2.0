@@ -1,44 +1,83 @@
 import { z } from 'zod';
-import { t } from '../trpc';
+import { router, publicProcedure, middleware } from '../trpc';
 import { TaxiSchema } from '../utils/zodSchemas';
 import { TaxiService } from '../services/taxiService';
-import type { Context } from '../trpc';
+import { Context } from '../trpc';
 
-export const taxiRouter = t.router({
-  getAll: t.procedure.query(async () => {
-    return TaxiService.getAll();
+const isAuthenticated = middleware(({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new Error('Not authenticated');
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+const isAdmin = middleware(({ ctx, next }) => {
+  if (!ctx.user || ctx.user.role !== 'ADMIN') {
+    throw new Error('Not authorized');
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+export const taxiRouter = router({
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const taxiService = new TaxiService(ctx.prisma);
+    return taxiService.getAllTaxis();
   }),
 
-  getById: t.procedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      return TaxiService.getById(input.id);
+  getById: publicProcedure
+    .input(z.number())
+    .query(async ({ ctx, input }) => {
+      const taxiService = new TaxiService(ctx.prisma);
+      return taxiService.getTaxiById(input);
     }),
 
-  create: t.procedure
+  create: publicProcedure
+    .use(isAuthenticated)
+    .use(isAdmin)
     .input(TaxiSchema)
-    .mutation(async ({ input }) => {
-      return TaxiService.create(input);
+    .mutation(async ({ ctx, input }) => {
+      const taxiService = new TaxiService(ctx.prisma);
+      return taxiService.createTaxi(input);
     }),
 
-  update: t.procedure
+  update: publicProcedure
+    .use(isAuthenticated)
+    .use(isAdmin)
     .input(z.object({
       id: z.number(),
-      data: TaxiSchema
+      data: TaxiSchema.partial(),
     }))
-    .mutation(async ({ input }) => {
-      return TaxiService.update(input.id, input.data);
+    .mutation(async ({ ctx, input }) => {
+      const taxiService = new TaxiService(ctx.prisma);
+      return taxiService.updateTaxi(input.id, input.data);
     }),
 
-  delete: t.procedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      return TaxiService.delete(input.id);
+  delete: publicProcedure
+    .use(isAuthenticated)
+    .use(isAdmin)
+    .input(z.number())
+    .mutation(async ({ ctx, input }) => {
+      const taxiService = new TaxiService(ctx.prisma);
+      return taxiService.deleteTaxi(input);
     }),
 
-  getByPlace: t.procedure
-    .input(z.object({ placeId: z.number() }))
-    .query(async ({ input }) => {
-      return TaxiService.getTaxisByPlace(input.placeId);
+  search: publicProcedure
+    .input(z.object({
+      query: z.string(),
+      available: z.boolean().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const taxiService = new TaxiService(ctx.prisma);
+      return taxiService.searchTaxis(input.query, input.available);
     }),
 }); 

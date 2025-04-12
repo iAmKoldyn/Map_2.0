@@ -8,6 +8,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/map_db
       NODE_ENV: development
+      JWT_SECRET: your-secret-key
     depends_on:
       db:
         condition: service_healthy

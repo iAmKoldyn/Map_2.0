@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
-import { Role } from '@prisma/client';
+import { UserRole } from './authMiddleware';
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -17,7 +17,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-export const requireRole = (role: Role) => {
+export const requireRole = (role: UserRole) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.user?.role !== role) {
       return res.status(403).json({ error: 'Insufficient permissions' });
@@ -30,8 +30,9 @@ declare global {
   namespace Express {
     interface Request {
       user?: {
-        userId: number;
-        role: Role;
+        id: number;
+        email: string;
+        role: UserRole;
       };
     }
   }

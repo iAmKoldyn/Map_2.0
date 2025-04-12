@@ -1,50 +1,77 @@
 import { z } from 'zod';
-import { t } from '../trpc';
+import { router, publicProcedure, middleware } from '../trpc';
 import { ReviewSchema } from '../utils/zodSchemas';
 import { ReviewService } from '../services/reviewService';
-import type { Context } from '../trpc';
+import { Context } from '../trpc';
 
-export const reviewRouter = t.router({
-  getAll: t.procedure.query(async () => {
-    return ReviewService.getAll();
+const reviewService = new ReviewService();
+
+const isAuthenticated = middleware(({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new Error('Not authenticated');
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+export const reviewRouter = router({
+  getAll: publicProcedure.query(() => {
+    return reviewService.getAllReviews();
   }),
 
-  getById: t.procedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ input }) => {
-      return ReviewService.getById(input.id);
+  getById: publicProcedure
+    .input(z.number())
+    .query(({ input }) => {
+      return reviewService.getReviewById(input);
     }),
 
-  create: t.procedure
+  create: publicProcedure
+    .use(isAuthenticated)
     .input(ReviewSchema)
-    .mutation(async ({ input }) => {
-      return ReviewService.create(input);
+    .mutation(({ input, ctx }) => {
+      return reviewService.createReview({
+        ...input,
+        userId: ctx.user.id
+      });
     }),
 
-  update: t.procedure
+  update: publicProcedure
+    .use(isAuthenticated)
     .input(z.object({
       id: z.number(),
-      data: ReviewSchema
+      data: ReviewSchema.partial()
     }))
-    .mutation(async ({ input }) => {
-      return ReviewService.update(input.id, input.data);
+    .mutation(({ input, ctx }) => {
+      return reviewService.updateReview(input.id, {
+        ...input.data,
+        userId: ctx.user.id
+      });
     }),
 
-  delete: t.procedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      return ReviewService.delete(input.id);
+  delete: publicProcedure
+    .use(isAuthenticated)
+    .input(z.number())
+    .mutation(({ input }) => {
+      return reviewService.deleteReview(input);
     }),
 
-  getByPlace: t.procedure
+  getByPlace: publicProcedure
+    .input(z.number())
+    .query(({ input }) => {
+      return reviewService.getByPlace(input);
+    }),
+
+  getAverageRating: publicProcedure
     .input(z.object({ placeId: z.number() }))
     .query(async ({ input }) => {
-      return ReviewService.getByPlace(input.placeId);
-    }),
-
-  getAverageRating: t.procedure
-    .input(z.object({ placeId: z.number() }))
-    .query(async ({ input }) => {
-      return ReviewService.getAverageRating(input.placeId);
-    }),
+      try {
+        return await reviewService.getAverageRating(input.placeId);
+      } catch (error) {
+        throw new Error('Failed to get average rating');
+      }
+    })
 }); 

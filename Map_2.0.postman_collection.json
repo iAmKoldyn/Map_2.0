@@ -1,0 +1,481 @@
+{
+  "info": {
+    "name": "Map 2.0 API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/auth.register",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "auth.register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/auth.login",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "auth.login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Places",
+      "item": [
+        {
+          "name": "Get All Places",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/trpc/place.getAll",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.getAll"]
+            }
+          }
+        },
+        {
+          "name": "Get Place by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.getById",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.getById"]
+            }
+          }
+        },
+        {
+          "name": "Create Place",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Place\",\n  \"description\": \"Test Description\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"category\": \"RESTAURANT\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.create",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.create"]
+            }
+          }
+        },
+        {
+          "name": "Update Place",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Updated Place\",\n    \"description\": \"Updated Description\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.update",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Place",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.delete",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.delete"]
+            }
+          }
+        },
+        {
+          "name": "Search Places",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"restaurant\",\n  \"category\": \"RESTAURANT\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.search",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.search"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Taxis",
+      "item": [
+        {
+          "name": "Get All Taxis",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.getAll",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.getAll"]
+            }
+          }
+        },
+        {
+          "name": "Get Taxi by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.getById",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.getById"]
+            }
+          }
+        },
+        {
+          "name": "Create Taxi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Taxi\",\n  \"phone\": \"+1234567890\",\n  \"available\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.create",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.create"]
+            }
+          }
+        },
+        {
+          "name": "Update Taxi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Updated Taxi\",\n    \"available\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.update",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Taxi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.delete",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.delete"]
+            }
+          }
+        },
+        {
+          "name": "Search Taxis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"test\",\n  \"available\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.search",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.search"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get All Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getAll",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getAll"]
+            }
+          }
+        },
+        {
+          "name": "Get Review by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getById",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getById"]
+            }
+          }
+        },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placeId\": 1,\n  \"rating\": 5,\n  \"content\": \"Great place!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.create",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.create"]
+            }
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"rating\": 4,\n    \"content\": \"Updated review\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.update",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.delete",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.delete"]
+            }
+          }
+        },
+        {
+          "name": "Get Reviews by Place",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placeId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getByPlace",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getByPlace"]
+            }
+          }
+        },
+        {
+          "name": "Get Average Rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"placeId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getAverageRating",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getAverageRating"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    }
+  ]
+} 

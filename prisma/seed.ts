@@ -1,8 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserRole } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  // Create test user
+  const hashedPassword = await bcrypt.hash('test123', 10);
+  const testUser = await prisma.user.create({
+    data: {
+      email: 'test@example.com',
+      password: hashedPassword,
+      role: UserRole.USER,
+    },
+  });
+
   // Create test places
   const places = await Promise.all([
     prisma.place.create({
@@ -75,6 +86,7 @@ async function main() {
         rating: 5,
         author: 'John Doe',
         placeId: places[0].id,
+        userId: testUser.id,
       },
     }),
     prisma.review.create({
@@ -83,8 +95,22 @@ async function main() {
         rating: 4,
         author: 'Jane Smith',
         placeId: places[1].id,
+        userId: testUser.id,
       },
     }),
+  ]);
+
+  console.log('Seed data created successfully!');
+}
+
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  }); 
   ]);
 
   console.log('Seed data created successfully!');

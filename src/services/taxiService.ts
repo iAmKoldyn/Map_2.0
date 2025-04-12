@@ -3,19 +3,23 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { TaxiSchema } from '../utils/zodSchemas';
 
-const prisma = new PrismaClient();
-
 export class TaxiService {
-  static async getAll() {
-    return await prisma.taxi.findMany({
+  private prisma: PrismaClient;
+
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
+  }
+
+  async getAllTaxis() {
+    return await this.prisma.taxi.findMany({
       include: {
         places: true
       }
     });
   }
 
-  static async getById(id: number) {
-    const taxi = await prisma.taxi.findUnique({
+  async getTaxiById(id: number) {
+    const taxi = await this.prisma.taxi.findUnique({
       where: { id },
       include: {
         places: true
@@ -32,8 +36,8 @@ export class TaxiService {
     return taxi;
   }
 
-  static async create(data: z.infer<typeof TaxiSchema>) {
-    return await prisma.taxi.create({
+  async createTaxi(data: z.infer<typeof TaxiSchema>) {
+    return await this.prisma.taxi.create({
       data,
       include: {
         places: true
@@ -41,9 +45,9 @@ export class TaxiService {
     });
   }
 
-  static async update(id: number, data: z.infer<typeof TaxiSchema>) {
+  async updateTaxi(id: number, data: Partial<z.infer<typeof TaxiSchema>>) {
     try {
-      return await prisma.taxi.update({
+      return await this.prisma.taxi.update({
         where: { id },
         data,
         include: {
@@ -58,9 +62,9 @@ export class TaxiService {
     }
   }
 
-  static async delete(id: number) {
+  async deleteTaxi(id: number) {
     try {
-      return await prisma.taxi.delete({
+      return await this.prisma.taxi.delete({
         where: { id }
       });
     } catch (error) {
@@ -71,8 +75,24 @@ export class TaxiService {
     }
   }
 
-  static async getTaxisByPlace(placeId: number) {
-    return prisma.taxi.findMany({
+  async searchTaxis(query: string, available?: boolean) {
+    return this.prisma.taxi.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { company: { contains: query, mode: 'insensitive' } },
+          { phone: { contains: query, mode: 'insensitive' } }
+        ],
+        ...(available !== undefined ? { isAvailable: available } : {})
+      },
+      include: {
+        places: true
+      }
+    });
+  }
+
+  async getTaxisByPlace(placeId: number) {
+    return this.prisma.taxi.findMany({
       where: {
         places: {
           some: {

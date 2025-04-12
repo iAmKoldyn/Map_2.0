@@ -6,19 +6,33 @@ import { ReviewSchema } from '../utils/zodSchemas';
 const prisma = new PrismaClient();
 
 export class ReviewService {
-  static async getAll() {
-    return await prisma.review.findMany({
+  async getAllReviews() {
+    return prisma.review.findMany({
       include: {
-        place: true
+        place: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true
+          }
+        }
       }
     });
   }
 
-  static async getById(id: number) {
+  async getReviewById(id: number) {
     const review = await prisma.review.findUnique({
       where: { id },
       include: {
-        place: true
+        place: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true
+          }
+        }
       }
     });
 
@@ -32,22 +46,48 @@ export class ReviewService {
     return review;
   }
 
-  static async create(data: z.infer<typeof ReviewSchema>) {
-    return await prisma.review.create({
-      data,
+  async createReview(data: typeof ReviewSchema._type) {
+    return prisma.review.create({
+      data: {
+        content: data.content,
+        rating: data.rating,
+        author: data.author,
+        placeId: data.placeId,
+        userId: data.userId
+      },
       include: {
-        place: true
+        place: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true
+          }
+        }
       }
     });
   }
 
-  static async update(id: number, data: z.infer<typeof ReviewSchema>) {
+  async updateReview(id: number, data: Partial<typeof ReviewSchema._type>) {
     try {
-      return await prisma.review.update({
+      return prisma.review.update({
         where: { id },
-        data,
+        data: {
+          content: data.content,
+          rating: data.rating,
+          author: data.author,
+          placeId: data.placeId,
+          userId: data.userId
+        },
         include: {
-          place: true
+          place: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              role: true
+            }
+          }
         }
       });
     } catch (error) {
@@ -58,9 +98,9 @@ export class ReviewService {
     }
   }
 
-  static async delete(id: number) {
+  async deleteReview(id: number) {
     try {
-      return await prisma.review.delete({
+      return prisma.review.delete({
         where: { id }
       });
     } catch (error) {
@@ -71,18 +111,23 @@ export class ReviewService {
     }
   }
 
-  static async getByPlace(placeId: number) {
-    return await prisma.review.findMany({
-      where: {
-        placeId
-      },
+  async getByPlace(placeId: number) {
+    return prisma.review.findMany({
+      where: { placeId },
       include: {
-        place: true
+        place: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true
+          }
+        }
       }
     });
   }
 
-  static async getAverageRating(placeId: number) {
+  async getAverageRating(placeId: number) {
     const result = await prisma.review.aggregate({
       where: { placeId },
       _avg: {

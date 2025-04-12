@@ -1,0 +1,576 @@
+{
+  "info": {
+    "name": "Travel Service API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/auth.register",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "auth.register"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"USER\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"result\": {\n    \"data\": {\n      \"user\": {\n        \"id\": 1,\n        \"email\": \"user@example.com\",\n        \"role\": \"USER\"\n      },\n      \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"123\"\n}"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"code\": \"BAD_REQUEST\",\n    \"message\": \"Invalid input data\",\n    \"details\": [\n      {\n        \"field\": \"email\",\n        \"message\": \"Invalid email format\"\n      },\n      {\n        \"field\": \"password\",\n        \"message\": \"Password must be at least 8 characters\"\n      }\n    ]\n  }\n}"
+            },
+            {
+              "name": "Conflict Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"existing@example.com\",\n  \"password\": \"password123\"\n}"
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"code\": \"CONFLICT\",\n    \"message\": \"Email already exists\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/auth.login",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "auth.login"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"result\": {\n    \"data\": {\n      \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n    }\n  }\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"error\": {\n    \"code\": \"UNAUTHORIZED\",\n    \"message\": \"Invalid credentials\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"your_refresh_token_here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/auth.refreshToken",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "auth.refreshToken"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Places",
+      "item": [
+        {
+          "name": "Get All Places",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/place.getAll",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.getAll"]
+            }
+          }
+        },
+        {
+          "name": "Get Place by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/place.getById?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.getById"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Place",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Central Park\",\n  \"description\": \"A beautiful park in the heart of New York City\",\n  \"latitude\": 40.7829,\n  \"longitude\": -73.9654,\n  \"address\": \"Central Park, New York, NY\",\n  \"city\": \"New York\",\n  \"country\": \"USA\",\n  \"category\": \"attraction\",\n  \"imageUrl\": \"https://example.com/central-park.jpg\",\n  \"website\": \"https://www.centralparknyc.org\",\n  \"phone\": \"+12123101234\",\n  \"email\": \"info@centralparknyc.org\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.create",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.create"]
+            }
+          }
+        },
+        {
+          "name": "Update Place",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Updated Central Park\",\n    \"description\": \"An updated description of Central Park\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.update",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Place",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/place.delete",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "place.delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Taxis",
+      "item": [
+        {
+          "name": "Get All Taxis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.getAll",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.getAll"]
+            }
+          }
+        },
+        {
+          "name": "Get Taxi by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.getById?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.getById"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Taxi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Yellow Cab\",\n  \"phone\": \"555-0123\",\n  \"company\": \"NYC Taxis\",\n  \"isAvailable\": true,\n  \"places\": {\n    \"connect\": [\n      { \"id\": 1 }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.create",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.create"]
+            }
+          }
+        },
+        {
+          "name": "Update Taxi",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Updated Yellow Cab\",\n    \"phone\": \"555-0124\",\n    \"isAvailable\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.update",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Taxi",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/taxi.delete",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "taxi.delete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get All Reviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getAll",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getAll"]
+            }
+          }
+        },
+        {
+          "name": "Get Review by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getById?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getById"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great place to visit!\",\n  \"rating\": 5,\n  \"placeId\": 1,\n  \"userId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.create",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.create"]
+            }
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"content\": \"Updated review content\",\n    \"rating\": 4\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.update",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.update"]
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/trpc/review.delete",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.delete"]
+            }
+          }
+        },
+        {
+          "name": "Get Reviews by Place",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getByPlace?placeId=1",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getByPlace"],
+              "query": [
+                {
+                  "key": "placeId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Average Rating",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/trpc/review.getAverageRating?placeId=1",
+              "host": ["{{base_url}}"],
+              "path": ["trpc", "review.getAverageRating"],
+              "query": [
+                {
+                  "key": "placeId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "auth_token",
+      "value": "your_auth_token_here"
+    }
+  ]
+} 
