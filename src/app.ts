@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logging';
 import { ZodError } from 'zod';
 import { Request, Response, NextFunction } from 'express';
+import { setupSwagger } from './config/swagger';
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
+
+// Setup Swagger documentation
+setupSwagger(app);
 
 // tRPC middleware mounted at "/trpc"
 app.use(
@@ -120,4 +124,5 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+  console.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
 }); 

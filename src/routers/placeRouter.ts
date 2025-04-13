@@ -29,12 +29,74 @@ const isAdmin = middleware(({ ctx, next }) => {
   });
 });
 
+/**
+ * @swagger
+ * tags:
+ *   name: Places
+ *   description: Place management endpoints
+ */
+
 export const placeRouter = router({
+  /**
+   * @swagger
+   * /trpc/place.getAll:
+   *   get:
+   *     summary: Get all places
+   *     tags: [Places]
+   *     responses:
+   *       200:
+   *         description: List of places
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 $ref: '#/components/schemas/Place'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   getAll: publicProcedure.query(async ({ ctx }) => {
     const placeService = new PlaceService(ctx.prisma);
     return placeService.getAllPlaces();
   }),
 
+  /**
+   * @swagger
+   * /trpc/place.getById:
+   *   get:
+   *     summary: Get a place by ID
+   *     tags: [Places]
+   *     parameters:
+   *       - in: query
+   *         name: input
+   *         required: true
+   *         schema:
+   *           type: integer
+   *         description: Place ID
+   *     responses:
+   *       200:
+   *         description: Place details
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Place'
+   *       404:
+   *         description: Place not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   getById: publicProcedure
     .input(z.union([
       z.number().int().positive(),
@@ -97,6 +159,78 @@ export const placeRouter = router({
       }
     }),
 
+  /**
+   * @swagger
+   * /trpc/place.create:
+   *   post:
+   *     summary: Create a new place
+   *     tags: [Places]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - name
+   *               - description
+   *               - latitude
+   *               - longitude
+   *             properties:
+   *               name:
+   *                 type: string
+   *               description:
+   *                 type: string
+   *               latitude:
+   *                 type: number
+   *                 format: float
+   *               longitude:
+   *                 type: number
+   *                 format: float
+   *               address:
+   *                 type: string
+   *               city:
+   *                 type: string
+   *               country:
+   *                 type: string
+   *               category:
+   *                 type: string
+   *               imageUrl:
+   *                 type: string
+   *               website:
+   *                 type: string
+   *               phone:
+   *                 type: string
+   *               email:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: Place created successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Place'
+   *       400:
+   *         description: Invalid input
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       401:
+   *         description: Unauthorized
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   create: publicProcedure
     .use(isAuthenticated)
     .use(isAdmin)
@@ -106,6 +240,87 @@ export const placeRouter = router({
       return placeService.createPlace(input);
     }),
 
+  /**
+   * @swagger
+   * /trpc/place.update:
+   *   put:
+   *     summary: Update a place
+   *     tags: [Places]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - id
+   *               - data
+   *             properties:
+   *               id:
+   *                 type: integer
+   *               data:
+   *                 type: object
+   *                 properties:
+   *                   name:
+   *                     type: string
+   *                   description:
+   *                     type: string
+   *                   latitude:
+   *                     type: number
+   *                     format: float
+   *                   longitude:
+   *                     type: number
+   *                     format: float
+   *                   address:
+   *                     type: string
+   *                   city:
+   *                     type: string
+   *                   country:
+   *                     type: string
+   *                   category:
+   *                     type: string
+   *                   imageUrl:
+   *                     type: string
+   *                   website:
+   *                     type: string
+   *                   phone:
+   *                     type: string
+   *                   email:
+   *                     type: string
+   *     responses:
+   *       200:
+   *         description: Place updated successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Place'
+   *       400:
+   *         description: Invalid input
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       401:
+   *         description: Unauthorized
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       404:
+   *         description: Place not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   update: publicProcedure
     .use(isAuthenticated)
     .use(isAdmin)
@@ -118,6 +333,49 @@ export const placeRouter = router({
       return placeService.updatePlace(input.id, input.data);
     }),
 
+  /**
+   * @swagger
+   * /trpc/place.delete:
+   *   delete:
+   *     summary: Delete a place
+   *     tags: [Places]
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: query
+   *         name: input
+   *         required: true
+   *         schema:
+   *           type: integer
+   *         description: Place ID
+   *     responses:
+   *       200:
+   *         description: Place deleted successfully
+   *       400:
+   *         description: Invalid input
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       401:
+   *         description: Unauthorized
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       404:
+   *         description: Place not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   */
   delete: publicProcedure
     .use(isAuthenticated)
     .use(isAdmin)
