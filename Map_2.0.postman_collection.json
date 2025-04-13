@@ -19,7 +19,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\",\n  \"role\": \"ADMIN\"\n}"
+              "raw": "{\n  \"email\": \"admin@map2.com\",\n  \"password\": \"Admin@123\",\n  \"role\": \"ADMIN\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/auth.register",
@@ -40,7 +40,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"email\": \"admin@map2.com\",\n  \"password\": \"Admin@123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/auth.login",
@@ -68,21 +68,23 @@
         {
           "name": "Get Place by ID",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": 1\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/trpc/place.getById",
+              "raw": "{{base_url}}/trpc/place.getById?input=1",
               "host": ["{{base_url}}"],
-              "path": ["trpc", "place.getById"]
+              "path": ["trpc", "place.getById"],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
@@ -102,7 +104,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Place\",\n  \"description\": \"Test Description\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"category\": \"RESTAURANT\"\n}"
+              "raw": "{\n  \"name\": \"Central Park Restaurant\",\n  \"description\": \"A cozy restaurant with a beautiful view of Central Park. Specializing in Italian cuisine with a modern twist.\",\n  \"latitude\": 40.7829,\n  \"longitude\": -73.9654,\n  \"category\": \"RESTAURANT\",\n  \"address\": \"123 Park Avenue, New York, NY 10022\",\n  \"phone\": \"+1 (212) 555-0123\",\n  \"website\": \"https://centralparkrestaurant.com\",\n  \"openingHours\": \"Mon-Fri: 11:00-22:00, Sat-Sun: 10:00-23:00\",\n  \"priceRange\": \"$$$\",\n  \"features\": [\"Outdoor Seating\", \"Wheelchair Accessible\", \"Reservations\", \"Full Bar\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/place.create",
@@ -127,7 +129,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Updated Place\",\n    \"description\": \"Updated Description\"\n  }\n}"
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Central Park Restaurant & Bar\",\n    \"description\": \"A cozy restaurant with a beautiful view of Central Park. Specializing in Italian cuisine with a modern twist. Now featuring an expanded bar area.\",\n    \"openingHours\": \"Mon-Fri: 11:00-23:00, Sat-Sun: 10:00-00:00\",\n    \"features\": [\"Outdoor Seating\", \"Wheelchair Accessible\", \"Reservations\", \"Full Bar\", \"Live Music\"]\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/place.update",
@@ -152,7 +154,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1\n}"
+              "raw": "4"
             },
             "url": {
               "raw": "{{base_url}}/trpc/place.delete",
@@ -173,7 +175,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"restaurant\",\n  \"category\": \"RESTAURANT\"\n}"
+              "raw": "{\n  \"query\": \"italian restaurant\",\n  \"category\": \"RESTAURANT\",\n  \"priceRange\": \"$$$\",\n  \"features\": [\"Outdoor Seating\", \"Full Bar\"],\n  \"latitude\": 40.7829,\n  \"longitude\": -73.9654,\n  \"radius\": 5000\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/place.search",
@@ -201,21 +203,23 @@
         {
           "name": "Get Taxi by ID",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": 1\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/trpc/taxi.getById",
+              "raw": "{{base_url}}/trpc/taxi.getById?input=1",
               "host": ["{{base_url}}"],
-              "path": ["trpc", "taxi.getById"]
+              "path": ["trpc", "taxi.getById"],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
@@ -235,7 +239,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Test Taxi\",\n  \"phone\": \"+1234567890\",\n  \"available\": true\n}"
+              "raw": "{\n  \"name\": \"Yellow Cab #1234\",\n  \"phone\": \"+1 (212) 555-1234\",\n  \"available\": true,\n  \"carModel\": \"Toyota Camry\",\n  \"licensePlate\": \"NY-1234\",\n  \"driverName\": \"John Smith\",\n  \"rating\": 4.5,\n  \"currentLocation\": {\n    \"latitude\": 40.7128,\n    \"longitude\": -74.0060\n  },\n  \"features\": [\"Air Conditioning\", \"Credit Card Payment\", \"Child Seat Available\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/taxi.create",
@@ -260,7 +264,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"name\": \"Updated Taxi\",\n    \"available\": false\n  }\n}"
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"available\": false,\n    \"currentLocation\": {\n      \"latitude\": 40.7145,\n      \"longitude\": -74.0072\n    },\n    \"rating\": 4.7,\n    \"features\": [\"Air Conditioning\", \"Credit Card Payment\", \"Child Seat Available\", \"WiFi\"]\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/taxi.update",
@@ -306,7 +310,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"test\",\n  \"available\": true\n}"
+              "raw": "{\n  \"query\": \"yellow cab\",\n  \"available\": true,\n  \"features\": [\"Air Conditioning\", \"Credit Card Payment\"],\n  \"minRating\": 4.0,\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"radius\": 5000\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/taxi.search",
@@ -334,21 +338,23 @@
         {
           "name": "Get Review by ID",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id\": 1\n}"
-            },
             "url": {
-              "raw": "{{base_url}}/trpc/review.getById",
+              "raw": "{{base_url}}/trpc/review.getById?input=1",
               "host": ["{{base_url}}"],
-              "path": ["trpc", "review.getById"]
+              "path": ["trpc", "review.getById"],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "1"
+                }
+              ]
             }
           }
         },
@@ -368,7 +374,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"placeId\": 1,\n  \"rating\": 5,\n  \"content\": \"Great place!\"\n}"
+              "raw": "{\n  \"placeId\": 1,\n  \"rating\": 5,\n  \"content\": \"Absolutely amazing experience! The food was exceptional, and the service was top-notch. The view of Central Park from our table was breathtaking. We particularly enjoyed the homemade pasta and the extensive wine selection. Will definitely be coming back!\",\n  \"title\": \"Perfect Evening at Central Park Restaurant\",\n  \"visitDate\": \"2024-03-15\",\n  \"photos\": [\"https://example.com/photo1.jpg\", \"https://example.com/photo2.jpg\"],\n  \"tags\": [\"Great Food\", \"Excellent Service\", \"Beautiful View\", \"Romantic Atmosphere\"]\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/review.create",
@@ -393,7 +399,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"rating\": 4,\n    \"content\": \"Updated review\"\n  }\n}"
+              "raw": "{\n  \"id\": 1,\n  \"data\": {\n    \"rating\": 4,\n    \"content\": \"Great experience overall! The food was delicious and the service was excellent. The view of Central Park was beautiful. The only minor issue was the slightly slow service during peak hours.\",\n    \"title\": \"Lovely Evening with Minor Service Delay\",\n    \"tags\": [\"Great Food\", \"Good Service\", \"Beautiful View\", \"Busy During Peak Hours\"]\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/review.update",
@@ -439,7 +445,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"placeId\": 1\n}"
+              "raw": "{\n  \"placeId\": 1,\n  \"sortBy\": \"rating\",\n  \"sortOrder\": \"desc\",\n  \"minRating\": 4,\n  \"limit\": 10,\n  \"offset\": 0\n}"
             },
             "url": {
               "raw": "{{base_url}}/trpc/review.getByPlace",

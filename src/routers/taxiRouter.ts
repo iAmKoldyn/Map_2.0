@@ -35,10 +35,15 @@ export const taxiRouter = router({
   }),
 
   getById: publicProcedure
-    .input(z.number())
+    .input(z.object({ id: z.coerce.number() }))
     .query(async ({ ctx, input }) => {
-      const taxiService = new TaxiService(ctx.prisma);
-      return taxiService.getTaxiById(input);
+      try {
+        const taxiService = new TaxiService(ctx.prisma);
+        return await taxiService.getTaxiById(input.id);
+      } catch (error) {
+        console.error('Error in getById:', error);
+        throw error;
+      }
     }),
 
   create: publicProcedure

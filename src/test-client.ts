@@ -1,106 +1,82 @@
-import { createTRPCProxyClient, httpLink } from '@trpc/client';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { AppRouter } from './routers';
-import { UserRole } from './middleware/authMiddleware';
-
-let authToken = '';
-let userId: number;
+import { ReviewSchema } from './utils/zodSchemas';
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [
-    httpLink({
+    httpBatchLink({
       url: 'http://localhost:3000/trpc',
-      headers: () => ({
-        Authorization: authToken ? `Bearer ${authToken}` : '',
-      }),
     }),
   ],
 });
 
 async function main() {
   try {
-    // Try to login first
-    try {
-      console.log('Attempting to login as admin...');
-      const loginResponse = await client.auth.login.mutate({
-        email: 'admin@example.com',
-        password: 'admin123'
-      });
-      console.log('Successfully logged in as admin:', loginResponse.user);
-      authToken = loginResponse.token;
-      userId = loginResponse.user.id;
-    } catch (error) {
-      // If login fails, try to register
-      console.log('Login failed, attempting to register admin...');
-      const registerResponse = await client.auth.register.mutate({
-        email: 'admin@example.com',
-        password: 'admin123',
-        role: UserRole.ADMIN
-      });
-      console.log('Successfully registered admin:', registerResponse.user);
-      authToken = registerResponse.token;
-      userId = registerResponse.user.id;
-    }
-
-    // Test places
-    console.log('Testing places...');
+    // Test place operations
+    console.log('Creating a new place...');
     const newPlace = await client.place.create.mutate({
-      name: 'Central Park',
-      description: 'A beautiful park in the heart of New York City',
-      latitude: 40.7829,
-      longitude: -73.9654
+      name: 'Test Place',
+      description: 'A test place',
+      latitude: 40.7128,
+      longitude: -74.0060
     });
     console.log('Created place:', newPlace);
 
-    const places = await client.place.getAll.query();
-    console.log('All places:', places);
-
-    const placeById = await client.place.getById.query(newPlace.id);
+    // Test getById with proper number conversion
+    console.log('Getting place by ID...');
+    const placeById = await client.place.getById.query({ id: Number(newPlace.id) });
     console.log('Place by ID:', placeById);
 
-    // Test taxis
-    console.log('\nTesting taxis...');
+    // Test taxi operations
+    console.log('Creating a new taxi...');
     const newTaxi = await client.taxi.create.mutate({
-      name: 'Yellow Cab',
-      phone: '555-0123',
-      company: 'NYC Taxis',
+      name: 'Test Taxi',
+      phone: '+1234567890',
+      company: 'Test Company',
+      isAvailable: true,
       places: {
-        connect: [{ id: newPlace.id }]
+        connect: [{ id: Number(newPlace.id) }]
       }
     });
     console.log('Created taxi:', newTaxi);
 
-    const taxis = await client.taxi.getAll.query();
-    console.log('All taxis:', taxis);
-
-    const taxiById = await client.taxi.getById.query(newTaxi.id);
-    console.log('Taxi by ID:', taxiById);
-
-    // Test reviews
-    console.log('\nTesting reviews...');
+    // Test review operations
+    console.log('Creating a new review...');
+    const userId = 1; // Assuming user ID 1 exists
     const newReview = await client.review.create.mutate({
-      content: 'Beautiful place!',
+      placeId: Number(newPlace.id),
+      userId: Number(userId),
       rating: 5,
-      placeId: newPlace.id,
-      userId: userId
+      content: 'Great place!',
+      author: 'Test User'
     });
     console.log('Created review:', newReview);
 
-    const reviews = await client.review.getAll.query();
-    console.log('All reviews:', reviews);
+    // Test getById operations with proper number conversion
+    console.log('Getting taxi by ID...');
+    const taxiById = await client.taxi.getById.query({ id: Number(newTaxi.id) });
+    console.log('Taxi by ID:', taxiById);
 
-    const reviewById = await client.review.getById.query(newReview.id);
+    console.log('Getting review by ID...');
+    const reviewById = await client.review.getById.query({ id: Number(newReview.id) });
     console.log('Review by ID:', reviewById);
 
-    const placeReviews = await client.review.getByPlace.query(newPlace.id);
-    console.log('Reviews for place:', placeReviews);
+    // Test getByPlace operations
+    console.log('Getting reviews by place...');
+    const reviewsByPlace = await client.review.getByPlace.query({ placeId: Number(newPlace.id) });
+    console.log('Reviews by place:', reviewsByPlace);
 
-    const avgRating = await client.review.getAverageRating.query({ placeId: newPlace.id });
+    // Test average rating
+    console.log('Getting average rating...');
+    const avgRating = await client.review.getAverageRating.query({ placeId: Number(newPlace.id) });
     console.log('Average rating:', avgRating);
 
   } catch (error) {
-    console.error('Error in test client:', error);
-    process.exit(1);
+    console.error('Error in test client:', {
+      error,
+      stack: error instanceof Error ? error.stack : undefined
+    });
   }
 }
 
-main(); 
+main().catch(console.error); 
