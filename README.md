@@ -11,6 +11,7 @@ A backend service for travel applications using Express, tRPC, and Prisma.
 - Role-based access control
 - Rate limiting
 - CORS support
+- Swagger API documentation
 
 ## Prerequisites
 
@@ -47,6 +48,32 @@ docker compose exec backend npx prisma migrate deploy
 ```
 
 ## API Documentation
+
+### Swagger Documentation
+
+The API is documented using Swagger/OpenAPI 3.0 specification. You can access the documentation in two ways:
+
+1. **Interactive Swagger UI**:
+   - URL: `http://localhost:3000/api-docs`
+   - Features:
+     - Interactive API documentation
+     - Try out endpoints directly from the browser
+     - View request/response schemas
+     - Authentication testing
+
+2. **Raw OpenAPI Specification**:
+   - URL: `http://localhost:3000/api-docs.json`
+   - Use this for:
+     - API client generation
+     - Integration with other tools
+     - Automated testing
+
+The documentation includes:
+- All API endpoints with their HTTP methods
+- Request/response schemas
+- Authentication requirements
+- Example requests and responses
+- Error codes and messages
 
 ### Authentication
 
