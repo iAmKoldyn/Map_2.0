@@ -19,7 +19,7 @@ export const verifyToken = (token: string): TokenPayload => {
     return {
       id: decoded.id,
       email: decoded.email,
-      role: decoded.role
+      role: decoded.role,
     };
   } catch (error) {
     throw new Error('Invalid token');
@@ -28,4 +28,4 @@ export const verifyToken = (token: string): TokenPayload => {
 
 export const generateRefreshToken = (payload: TokenPayload): string => {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
-}; 
+};

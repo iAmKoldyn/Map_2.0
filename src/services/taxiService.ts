@@ -13,8 +13,8 @@ export class TaxiService {
   async getAllTaxis() {
     return await this.prisma.taxi.findMany({
       include: {
-        places: true
-      }
+        places: true,
+      },
     });
   }
 
@@ -22,14 +22,14 @@ export class TaxiService {
     const taxi = await this.prisma.taxi.findUnique({
       where: { id },
       include: {
-        places: true
-      }
+        places: true,
+      },
     });
 
     if (!taxi) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Taxi not found'
+        message: 'Taxi not found',
       });
     }
 
@@ -40,8 +40,8 @@ export class TaxiService {
     return await this.prisma.taxi.create({
       data,
       include: {
-        places: true
-      }
+        places: true,
+      },
     });
   }
 
@@ -51,13 +51,13 @@ export class TaxiService {
         where: { id },
         data,
         include: {
-          places: true
-        }
+          places: true,
+        },
       });
     } catch (error) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Taxi not found'
+        message: 'Taxi not found',
       });
     }
   }
@@ -65,12 +65,12 @@ export class TaxiService {
   async deleteTaxi(id: number) {
     try {
       return await this.prisma.taxi.delete({
-        where: { id }
+        where: { id },
       });
     } catch (error) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Taxi not found'
+        message: 'Taxi not found',
       });
     }
   }
@@ -81,13 +81,13 @@ export class TaxiService {
         OR: [
           { name: { contains: query, mode: 'insensitive' } },
           { company: { contains: query, mode: 'insensitive' } },
-          { phone: { contains: query, mode: 'insensitive' } }
+          { phone: { contains: query, mode: 'insensitive' } },
         ],
-        ...(available !== undefined ? { isAvailable: available } : {})
+        ...(available !== undefined ? { isAvailable: available } : {}),
       },
       include: {
-        places: true
-      }
+        places: true,
+      },
     });
   }
 
@@ -105,4 +105,4 @@ export class TaxiService {
       },
     });
   }
-} 
+}

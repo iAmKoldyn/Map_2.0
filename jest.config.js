@@ -7,13 +7,9 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/__tests__/**',
-  ],
+  collectCoverage: true,
   coverageDirectory: 'coverage',
-  coverageReporters: ['text', 'lcov', 'clover'],
+  coverageReporters: ['text', 'lcov'],
   coverageThreshold: {
     global: {
       branches: 80,

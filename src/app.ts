@@ -3,7 +3,7 @@ import cors from 'cors';
 import { createContext } from './trpc';
 import { appRouter } from './routers';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { config } from './config/index';
+import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logging';
 import { ZodError } from 'zod';
@@ -36,10 +36,10 @@ app.use(
           code: error.code,
           message: error.message,
           cause: error.cause,
-          stack: error.stack
+          stack: error.stack,
         },
         context: ctx,
-        url: req.url
+        url: req.url,
       });
 
       // Handle input validation errors
@@ -52,9 +52,9 @@ app.use(
             data: {
               httpStatus: 400,
               issues: error.cause.errors,
-              path
-            }
-          }
+              path,
+            },
+          },
         };
       }
 
@@ -67,11 +67,11 @@ app.use(
           data: {
             httpStatus: error.code === 'NOT_FOUND' ? 404 : 500,
             path,
-            ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
-          }
-        }
+            ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+          },
+        },
       };
-    }
+    },
   })
 );
 
@@ -92,31 +92,31 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', {
     promise,
     reason,
-    stack: reason instanceof Error ? reason.stack : undefined
+    stack: reason instanceof Error ? reason.stack : undefined,
   });
 });
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', {
     error,
-    stack: error.stack
+    stack: error.stack,
   });
 });
 
 // Error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error('Global error handler:', {
     error: err,
     stack: err.stack,
     url: req.url,
-    method: req.method
+    method: req.method,
   });
-  
+
   res.status(500).json({
     error: {
       code: 'INTERNAL_SERVER_ERROR',
-      message: err.message || 'An unexpected error occurred'
-    }
+      message: err.message || 'An unexpected error occurred',
+    },
   });
 });
 
@@ -125,4 +125,4 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
   console.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
-}); 
+});

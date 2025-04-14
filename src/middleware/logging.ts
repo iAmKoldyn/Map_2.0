@@ -6,4 +6,4 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
     console.log('Request body:', JSON.stringify(req.body, null, 2));
   }
   next();
-}; 
+};

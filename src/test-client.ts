@@ -18,7 +18,7 @@ async function main() {
       name: 'Test Place',
       description: 'A test place',
       latitude: 40.7128,
-      longitude: -74.0060
+      longitude: -74.006,
     });
     console.log('Created place:', newPlace);
 
@@ -35,8 +35,8 @@ async function main() {
       company: 'Test Company',
       isAvailable: true,
       places: {
-        connect: [{ id: Number(newPlace.id) }]
-      }
+        connect: [{ id: Number(newPlace.id) }],
+      },
     });
     console.log('Created taxi:', newTaxi);
 
@@ -48,7 +48,7 @@ async function main() {
       userId: Number(userId),
       rating: 5,
       content: 'Great place!',
-      author: 'Test User'
+      author: 'Test User',
     });
     console.log('Created review:', newReview);
 
@@ -70,13 +70,12 @@ async function main() {
     console.log('Getting average rating...');
     const avgRating = await client.review.getAverageRating.query({ placeId: Number(newPlace.id) });
     console.log('Average rating:', avgRating);
-
   } catch (error) {
     console.error('Error in test client:', {
       error,
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
   }
 }
 
-main().catch(console.error); 
+main().catch(console.error);

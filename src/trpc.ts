@@ -63,7 +63,7 @@ const errorHandler = t.middleware(async ({ path, type, next }) => {
       path,
       type,
       error,
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
 
     // Handle known error types
@@ -75,7 +75,7 @@ const errorHandler = t.middleware(async ({ path, type, next }) => {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'Invalid input data',
-        cause: error
+        cause: error,
       });
     }
 
@@ -83,7 +83,7 @@ const errorHandler = t.middleware(async ({ path, type, next }) => {
     throw new TRPCError({
       code: 'INTERNAL_SERVER_ERROR',
       message: 'An unexpected error occurred',
-      cause: error
+      cause: error,
     });
   }
 });
@@ -125,14 +125,14 @@ export const inputMiddleware = middleware(async ({ next, rawInput }) => {
       try {
         const parsed = JSON.parse(rawInput);
         return next({
-          rawInput: parsed
+          rawInput: parsed,
         });
       } catch (e) {
         console.error('Error parsing input:', e);
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Invalid input format',
-          cause: e
+          cause: e,
         });
       }
     }
@@ -140,7 +140,7 @@ export const inputMiddleware = middleware(async ({ next, rawInput }) => {
   } catch (error) {
     console.error('Error in input middleware:', {
       error,
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
     });
     throw error;
   }
@@ -179,4 +179,4 @@ const isAdmin = middleware(({ ctx, next }) => {
 export const protectedProcedure = t.procedure.use(isAuthenticated);
 export const adminProcedure = t.procedure.use(isAdmin);
 
-export const createTRPCRouter = t.router; 
+export const createTRPCRouter = t.router;

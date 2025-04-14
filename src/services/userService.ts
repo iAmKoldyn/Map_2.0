@@ -18,21 +18,21 @@ export class UserService {
     if (!email || !password) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Email and password are required'
+        message: 'Email and password are required',
       });
     }
 
     if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Invalid email format'
+        message: 'Invalid email format',
       });
     }
 
     if (password.length < 8) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Password must be at least 8 characters long'
+        message: 'Password must be at least 8 characters long',
       });
     }
 
@@ -44,7 +44,7 @@ export class UserService {
     if (existingUser) {
       throw new TRPCError({
         code: 'CONFLICT',
-        message: 'User already exists'
+        message: 'User already exists',
       });
     }
 
@@ -64,7 +64,7 @@ export class UserService {
       console.error('Registration error:', error);
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to create user'
+        message: 'Failed to create user',
       });
     }
   }
@@ -73,7 +73,7 @@ export class UserService {
     if (!email || !password) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Email and password are required'
+        message: 'Email and password are required',
       });
     }
 
@@ -85,7 +85,7 @@ export class UserService {
       if (!user) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: 'Invalid email or password'
+          message: 'Invalid email or password',
         });
       }
 
@@ -93,27 +93,27 @@ export class UserService {
       if (!isValidPassword) {
         throw new TRPCError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid email or password'
+          message: 'Invalid email or password',
         });
       }
 
       const tokenPayload = {
         id: user.id,
         email: user.email,
-        role: user.role as UserRole
+        role: user.role as UserRole,
       };
 
       const token = generateToken(tokenPayload);
       const refreshToken = generateRefreshToken(tokenPayload);
 
-      return { 
+      return {
         user: {
           id: user.id,
           email: user.email,
-          role: user.role
+          role: user.role,
         },
         token,
-        refreshToken
+        refreshToken,
       };
     } catch (error) {
       if (error instanceof TRPCError) {
@@ -122,7 +122,7 @@ export class UserService {
       console.error('Login error:', error);
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to login'
+        message: 'Failed to login',
       });
     }
   }
@@ -131,7 +131,7 @@ export class UserService {
     if (!refreshToken) {
       throw new TRPCError({
         code: 'BAD_REQUEST',
-        message: 'Refresh token is required'
+        message: 'Refresh token is required',
       });
     }
 
@@ -144,14 +144,14 @@ export class UserService {
       if (!user) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: 'User not found'
+          message: 'User not found',
         });
       }
 
       const tokenPayload = {
         id: user.id,
         email: user.email,
-        role: user.role as UserRole
+        role: user.role as UserRole,
       };
 
       const token = generateToken(tokenPayload);
@@ -162,7 +162,7 @@ export class UserService {
       console.error('Refresh token error:', error);
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'Invalid refresh token'
+        message: 'Invalid refresh token',
       });
     }
   }
@@ -177,7 +177,7 @@ export class UserService {
       if (!user) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: 'User not found'
+          message: 'User not found',
         });
       }
 
@@ -185,7 +185,7 @@ export class UserService {
     } catch (error) {
       throw new TRPCError({
         code: 'UNAUTHORIZED',
-        message: 'Invalid token'
+        message: 'Invalid token',
       });
     }
   }
@@ -194,7 +194,7 @@ export class UserService {
     const tokenPayload = {
       id: user.id,
       email: user.email,
-      role: user.role as UserRole
+      role: user.role as UserRole,
     };
 
     const token = generateToken(tokenPayload);

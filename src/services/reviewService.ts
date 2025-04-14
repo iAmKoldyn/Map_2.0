@@ -14,10 +14,10 @@ export class ReviewService {
           select: {
             id: true,
             email: true,
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     });
   }
 
@@ -30,16 +30,16 @@ export class ReviewService {
           select: {
             id: true,
             email: true,
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     });
 
     if (!review) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Review not found'
+        message: 'Review not found',
       });
     }
 
@@ -53,7 +53,7 @@ export class ReviewService {
         rating: data.rating,
         author: data.author,
         placeId: data.placeId,
-        userId: data.userId
+        userId: data.userId,
       },
       include: {
         place: true,
@@ -61,10 +61,10 @@ export class ReviewService {
           select: {
             id: true,
             email: true,
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     });
   }
 
@@ -77,7 +77,7 @@ export class ReviewService {
           rating: data.rating,
           author: data.author,
           placeId: data.placeId,
-          userId: data.userId
+          userId: data.userId,
         },
         include: {
           place: true,
@@ -85,15 +85,15 @@ export class ReviewService {
             select: {
               id: true,
               email: true,
-              role: true
-            }
-          }
-        }
+              role: true,
+            },
+          },
+        },
       });
     } catch (error) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Review not found'
+        message: 'Review not found',
       });
     }
   }
@@ -101,12 +101,12 @@ export class ReviewService {
   async deleteReview(id: number) {
     try {
       return prisma.review.delete({
-        where: { id }
+        where: { id },
       });
     } catch (error) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: 'Review not found'
+        message: 'Review not found',
       });
     }
   }
@@ -120,10 +120,10 @@ export class ReviewService {
           select: {
             id: true,
             email: true,
-            role: true
-          }
-        }
-      }
+            role: true,
+          },
+        },
+      },
     });
   }
 
@@ -131,9 +131,9 @@ export class ReviewService {
     const result = await prisma.review.aggregate({
       where: { placeId },
       _avg: {
-        rating: true
-      }
+        rating: true,
+      },
     });
     return result._avg.rating;
   }
-} 
+}

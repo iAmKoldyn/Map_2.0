@@ -4,7 +4,7 @@ import rateLimit from 'express-rate-limit';
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  USER = 'USER'
+  USER = 'USER',
 }
 
 export interface JwtPayload {
@@ -43,11 +43,11 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    
+
     req.user = {
       id: decoded.id,
       email: decoded.email,
-      role: decoded.role
+      role: decoded.role,
     };
 
     next();
@@ -64,13 +64,13 @@ export const requireRole = (role: UserRole) => {
     }
 
     if (req.user.role !== role) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         message: 'Insufficient permissions',
         requiredRole: role,
-        currentRole: req.user.role
+        currentRole: req.user.role,
       });
     }
 
     next();
   };
-}; 
+};

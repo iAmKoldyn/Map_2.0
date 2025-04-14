@@ -12,7 +12,7 @@ export const ReviewSchema = z.object({
   rating: z.number().min(1).max(5),
   author: z.string().optional(),
   placeId: z.number(),
-  userId: z.number()
+  userId: z.number(),
 });
 
 export const TaxiSchema = z.object({
@@ -20,9 +20,13 @@ export const TaxiSchema = z.object({
   phone: z.string().min(1, 'Phone number is required'),
   company: z.string().optional(),
   isAvailable: z.boolean().optional(),
-  places: z.object({
-    connect: z.array(z.object({
-      id: z.number()
-    }))
-  }).optional(),
-}); 
+  places: z
+    .object({
+      connect: z.array(
+        z.object({
+          id: z.number(),
+        })
+      ),
+    })
+    .optional(),
+});

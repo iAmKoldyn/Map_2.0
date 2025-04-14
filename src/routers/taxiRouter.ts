@@ -68,7 +68,7 @@ export const taxiRouter = router({
       throw new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Failed to fetch taxis',
-        cause: error
+        cause: error,
       });
     }
   }),
@@ -115,7 +115,7 @@ export const taxiRouter = router({
         if (!taxi) {
           throw new TRPCError({
             code: 'NOT_FOUND',
-            message: 'Taxi not found'
+            message: 'Taxi not found',
           });
         }
         return taxi;
@@ -127,7 +127,7 @@ export const taxiRouter = router({
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to fetch taxi',
-          cause: error
+          cause: error,
         });
       }
     }),
@@ -303,10 +303,12 @@ export const taxiRouter = router({
   update: publicProcedure
     .use(isAuthenticated)
     .use(isAdmin)
-    .input(z.object({
-      id: z.number(),
-      data: TaxiSchema.partial(),
-    }))
+    .input(
+      z.object({
+        id: z.number(),
+        data: TaxiSchema.partial(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
       const taxiService = new TaxiService(ctx.prisma);
       return taxiService.updateTaxi(input.id, input.data);
@@ -365,12 +367,14 @@ export const taxiRouter = router({
     }),
 
   search: publicProcedure
-    .input(z.object({
-      query: z.string(),
-      available: z.boolean().optional(),
-    }))
+    .input(
+      z.object({
+        query: z.string(),
+        available: z.boolean().optional(),
+      })
+    )
     .query(async ({ ctx, input }) => {
       const taxiService = new TaxiService(ctx.prisma);
       return taxiService.searchTaxis(input.query, input.available);
     }),
-}); 
+});

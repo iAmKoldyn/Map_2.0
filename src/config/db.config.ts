@@ -8,4 +8,4 @@ export const dbConfig = {
     min: 2,
     max: 10,
   },
-}; 
+};

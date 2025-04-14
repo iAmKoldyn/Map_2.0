@@ -8,7 +8,7 @@ export const appRouter = createTRPCRouter({
   place: placeRouter,
   taxi: taxiRouter,
   review: reviewRouter,
-  auth: authRouter
+  auth: authRouter,
 });
 
-export type AppRouter = typeof appRouter; 
+export type AppRouter = typeof appRouter;

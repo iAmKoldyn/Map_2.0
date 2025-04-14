@@ -3,17 +3,12 @@ import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('Error:', {
     message: err.message,
     stack: err.stack,
     code: (err as any).code,
-    name: err.name
+    name: err.name,
   });
 
   // Handle Prisma errors
@@ -22,8 +17,8 @@ export const errorHandler = (
       error: {
         code: err.code,
         message: err.message,
-        meta: err.meta
-      }
+        meta: err.meta,
+      },
     });
   }
 
@@ -33,8 +28,8 @@ export const errorHandler = (
       error: {
         code: err.code,
         message: err.message,
-        cause: err.cause
-      }
+        cause: err.cause,
+      },
     });
   }
 
@@ -44,8 +39,8 @@ export const errorHandler = (
       error: {
         code: 'VALIDATION_ERROR',
         message: 'Input validation failed',
-        issues: err.errors
-      }
+        issues: err.errors,
+      },
     });
   }
 
@@ -55,7 +50,7 @@ export const errorHandler = (
     error: {
       code: 'INTERNAL_SERVER_ERROR',
       message: err.message || 'An unexpected error occurred',
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-    }
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    },
   });
-}; 
+};

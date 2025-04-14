@@ -11,22 +11,22 @@ const options: swaggerJsdoc.Options = {
       description: 'API documentation for the Map 2.0 application',
       contact: {
         name: 'API Support',
-        email: 'support@map2.com'
-      }
+        email: 'support@map2.com',
+      },
     },
     servers: [
       {
         url: 'http://localhost:3000',
-        description: 'Development server'
-      }
+        description: 'Development server',
+      },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
+          bearerFormat: 'JWT',
+        },
       },
       schemas: {
         Place: {
@@ -46,8 +46,8 @@ const options: swaggerJsdoc.Options = {
             phone: { type: 'string', nullable: true },
             email: { type: 'string', nullable: true },
             createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' }
-          }
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
         },
         Taxi: {
           type: 'object',
@@ -64,11 +64,11 @@ const options: swaggerJsdoc.Options = {
               type: 'object',
               properties: {
                 latitude: { type: 'number', format: 'float' },
-                longitude: { type: 'number', format: 'float' }
-              }
+                longitude: { type: 'number', format: 'float' },
+              },
             },
-            features: { type: 'array', items: { type: 'string' } }
-          }
+            features: { type: 'array', items: { type: 'string' } },
+          },
         },
         Review: {
           type: 'object',
@@ -83,8 +83,8 @@ const options: swaggerJsdoc.Options = {
             photos: { type: 'array', items: { type: 'string' } },
             tags: { type: 'array', items: { type: 'string' } },
             createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' }
-          }
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
         },
         Error: {
           type: 'object',
@@ -96,15 +96,15 @@ const options: swaggerJsdoc.Options = {
               properties: {
                 httpStatus: { type: 'integer' },
                 path: { type: 'string' },
-                stack: { type: 'string', nullable: true }
-              }
-            }
-          }
-        }
-      }
-    }
+                stack: { type: 'string', nullable: true },
+              },
+            },
+          },
+        },
+      },
+    },
   },
-  apis: ['./src/routers/*.ts']
+  apis: ['./src/routers/*.ts'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
@@ -115,4 +115,4 @@ export const setupSwagger = (app: Express) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
   });
-}; 
+};

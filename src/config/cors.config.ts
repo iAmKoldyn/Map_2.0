@@ -4,4 +4,4 @@ export const corsConfig = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   maxAge: 86400, // 24 hours
-}; 
+};

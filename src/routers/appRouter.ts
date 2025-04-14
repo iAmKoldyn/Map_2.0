@@ -9,4 +9,4 @@ export const appRouter = router({
   review: reviewRouter,
 });
 
-export type AppRouter = typeof appRouter; 
+export type AppRouter = typeof appRouter;

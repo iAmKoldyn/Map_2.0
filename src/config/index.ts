@@ -9,4 +9,4 @@ export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
 };
 
-export type Config = typeof config; 
+export type Config = typeof config;
