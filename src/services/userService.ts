@@ -190,7 +190,7 @@ export class UserService {
     }
   }
 
-  private generateTokens(user: { id: number; email: string; role: "ADMIN" | "USER" }) {
+  private generateTokens(user: { id: number; email: string; role: 'ADMIN' | 'USER' }) {
     const tokenPayload = {
       id: user.id,
       email: user.email,
