@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { CreateExpressContextOptions } from '@trpc/server/adapters/express';
-import { prisma } from './prisma';
+import prisma from './prisma';
 import { UserRole } from './middleware/authMiddleware';
 import { verifyToken } from './utils/jwt';
 import { ZodError } from 'zod';

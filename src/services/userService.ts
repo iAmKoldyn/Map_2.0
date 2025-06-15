@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import { generateToken, generateRefreshToken, verifyToken } from '../utils/jwt';
 import { UserRole } from '../middleware/authMiddleware';
-import { prisma } from '../prisma';
+import prisma from '../prisma';
 import type { PrismaClient } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 
