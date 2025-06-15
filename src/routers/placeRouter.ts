@@ -99,9 +99,13 @@ export const placeRouter = router({
   getById: publicProcedure
     .input(
       z.object({
-        id: z.coerce.number().int().positive().refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        }),
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -371,9 +375,13 @@ export const placeRouter = router({
     .use(isAdmin)
     .input(
       z.object({
-        id: z.coerce.number().int().positive().refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        }),
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
       })
     )
     .mutation(async ({ ctx, input }) => {

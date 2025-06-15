@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 import { ReviewSchema } from '../utils/zodSchemas';
 
 const prisma = new PrismaClient();

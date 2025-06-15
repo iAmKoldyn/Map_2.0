@@ -18,12 +18,6 @@ export interface Context {
   } | null;
 }
 
-type ErrorData = {
-  zodError?: ReturnType<ZodError['flatten']>;
-  user?: Context['user'];
-  [key: string]: unknown;
-};
-
 export const createContext = async ({ req }: CreateExpressContextOptions): Promise<Context> => {
   try {
     const token = req.headers.authorization?.split(' ')[1];

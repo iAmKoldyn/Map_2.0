@@ -7,8 +7,8 @@ import { TRPCError } from '@trpc/server';
 
 const prismaClient = prisma as unknown as PrismaClient & {
   user: {
-    create: (args: any) => Promise<any>;
-    findUnique: (args: any) => Promise<any>;
+    create: (args: unknown) => Promise<unknown>;
+    findUnique: (args: unknown) => Promise<unknown>;
   };
 };
 
@@ -190,7 +190,7 @@ export class UserService {
     }
   }
 
-  private generateTokens(user: any) {
+  private generateTokens(user: { id: number; email: string; role: "ADMIN" | "USER" }) {
     const tokenPayload = {
       id: user.id,
       email: user.email,

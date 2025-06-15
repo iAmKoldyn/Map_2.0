@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { router, publicProcedure, middleware } from '../trpc';
 import { ReviewSchema } from '../utils/zodSchemas';
 import { ReviewService } from '../services/reviewService';
-import { Context } from '../trpc';
 import { TRPCError } from '@trpc/server';
 
 const reviewService = new ReviewService();
@@ -155,9 +154,13 @@ export const reviewRouter = router({
     .use(isAuthenticated)
     .input(
       z.object({
-        id: z.coerce.number().int().positive().refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        }),
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
       })
     )
     .mutation(async ({ input }) => {

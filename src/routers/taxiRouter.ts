@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { router, publicProcedure, middleware } from '../trpc';
 import { TaxiSchema } from '../utils/zodSchemas';
 import { TaxiService } from '../services/taxiService';
-import { Context } from '../trpc';
 import { TRPCError } from '@trpc/server';
 
 const isAuthenticated = middleware(({ ctx, next }) => {
@@ -109,9 +108,13 @@ export const taxiRouter = router({
   getById: publicProcedure
     .input(
       z.object({
-        id: z.coerce.number().int().positive().refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        }),
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -368,9 +371,13 @@ export const taxiRouter = router({
     .use(isAdmin)
     .input(
       z.object({
-        id: z.coerce.number().int().positive().refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        }),
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
       })
     )
     .mutation(async ({ ctx, input }) => {
