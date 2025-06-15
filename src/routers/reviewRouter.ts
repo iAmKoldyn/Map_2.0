@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure, middleware } from '../trpc';
-import { ReviewSchema } from '../utils/zodSchemas';
+import { ReviewSchema, IdSchema } from '../utils/zodSchemas';
 import { ReviewService } from '../services/reviewService';
-import { Context } from '../trpc';
 import { TRPCError } from '@trpc/server';
 
 const reviewService = new ReviewService();
@@ -36,59 +35,47 @@ export const reviewRouter = router({
     }
   }),
 
-  getById: publicProcedure
-    .input(
-      z.object({
-        id: z.coerce
-          .number()
-          .int()
-          .positive()
-          .refine((val) => !isNaN(val), {
-            message: 'ID must be a valid number',
-          }),
-      })
-    )
-    .query(async ({ input }) => {
-      try {
-        console.log('getById input:', input);
+  getById: publicProcedure.input(z.object({ id: IdSchema })).query(async ({ input }) => {
+    try {
+      console.log('getById input:', input);
 
-        if (!input.id) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'ID is required',
-          });
-        }
-
-        const review = await reviewService.getReviewById(input.id);
-
-        if (!review) {
-          console.log('Review not found for id:', input.id);
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Review not found',
-          });
-        }
-
-        console.log('Found review:', review);
-        return review;
-      } catch (error) {
-        console.error('Error in getById:', {
-          error,
-          input,
-          stack: error instanceof Error ? error.stack : undefined,
-        });
-
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-
+      if (!input.id) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to get review',
-          cause: error,
+          code: 'BAD_REQUEST',
+          message: 'ID is required',
         });
       }
-    }),
+
+      const review = await reviewService.getReviewById(input.id);
+
+      if (!review) {
+        console.log('Review not found for id:', input.id);
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Review not found',
+        });
+      }
+
+      console.log('Found review:', review);
+      return review;
+    } catch (error) {
+      console.error('Error in getById:', {
+        error,
+        input,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to get review',
+        cause: error,
+      });
+    }
+  }),
 
   create: publicProcedure
     .use(isAuthenticated)
@@ -119,13 +106,7 @@ export const reviewRouter = router({
     .use(isAuthenticated)
     .input(
       z.object({
-        id: z
-          .number()
-          .int()
-          .positive()
-          .refine((val) => !isNaN(val), {
-            message: 'ID must be a valid number',
-          }),
+        id: IdSchema,
         data: ReviewSchema.partial(),
       })
     )
@@ -153,27 +134,19 @@ export const reviewRouter = router({
 
   delete: publicProcedure
     .use(isAuthenticated)
-    .input(
-      z
-        .number()
-        .int()
-        .positive()
-        .refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        })
-    )
+    .input(z.object({ id: IdSchema }))
     .mutation(async ({ input }) => {
       try {
         console.log('delete input:', input);
 
-        if (!input) {
+        if (!input.id) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'ID is required',
           });
         }
 
-        const review = await reviewService.getReviewById(input);
+        const review = await reviewService.getReviewById(input.id);
 
         if (!review) {
           console.log('Review not found for id:', input);
@@ -183,7 +156,7 @@ export const reviewRouter = router({
           });
         }
 
-        return await reviewService.deleteReview(input);
+        return await reviewService.deleteReview(input.id);
       } catch (error) {
         console.error('Error in delete:', {
           error,
@@ -203,43 +176,21 @@ export const reviewRouter = router({
       }
     }),
 
-  getByPlace: publicProcedure
-    .input(
-      z.object({
-        placeId: z.coerce
-          .number()
-          .int()
-          .positive()
-          .refine((val) => !isNaN(val), {
-            message: 'Place ID must be a valid number',
-          }),
-      })
-    )
-    .query(async ({ input }) => {
-      try {
-        return await reviewService.getByPlace(input.placeId);
-      } catch (error) {
-        console.error('Error in getByPlace:', error);
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to get reviews by place',
-          cause: error,
-        });
-      }
-    }),
+  getByPlace: publicProcedure.input(z.object({ placeId: IdSchema })).query(async ({ input }) => {
+    try {
+      return await reviewService.getByPlace(input.placeId);
+    } catch (error) {
+      console.error('Error in getByPlace:', error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to get reviews by place',
+        cause: error,
+      });
+    }
+  }),
 
   getAverageRating: publicProcedure
-    .input(
-      z.object({
-        placeId: z.coerce
-          .number()
-          .int()
-          .positive()
-          .refine((val) => !isNaN(val), {
-            message: 'Place ID must be a valid number',
-          }),
-      })
-    )
+    .input(z.object({ placeId: IdSchema }))
     .query(async ({ input }) => {
       try {
         return await reviewService.getAverageRating(input.placeId);

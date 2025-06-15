@@ -1,6 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { AppRouter } from './routers';
-import { ReviewSchema } from './utils/zodSchemas';
 
 const client = createTRPCProxyClient<AppRouter>({
   links: [

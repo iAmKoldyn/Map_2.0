@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { TaxiSchema } from '../utils/zodSchemas';
+import { ensureNumericId } from '../utils/ensureNumericId';
 
 export class TaxiService {
   private prisma: PrismaClient;
@@ -18,9 +19,10 @@ export class TaxiService {
     });
   }
 
-  async getTaxiById(id: number) {
+  async getTaxiById(id: number | string) {
+    const numericId = ensureNumericId(id);
     const taxi = await this.prisma.taxi.findUnique({
-      where: { id },
+      where: { id: numericId },
       include: {
         places: true,
       },
@@ -45,10 +47,11 @@ export class TaxiService {
     });
   }
 
-  async updateTaxi(id: number, data: Partial<z.infer<typeof TaxiSchema>>) {
+  async updateTaxi(id: number | string, data: Partial<z.infer<typeof TaxiSchema>>) {
+    const numericId = ensureNumericId(id);
     try {
       return await this.prisma.taxi.update({
-        where: { id },
+        where: { id: numericId },
         data,
         include: {
           places: true,
@@ -62,10 +65,11 @@ export class TaxiService {
     }
   }
 
-  async deleteTaxi(id: number) {
+  async deleteTaxi(id: number | string) {
+    const numericId = ensureNumericId(id);
     try {
       return await this.prisma.taxi.delete({
-        where: { id },
+        where: { id: numericId },
       });
     } catch (error) {
       throw new TRPCError({
@@ -91,12 +95,13 @@ export class TaxiService {
     });
   }
 
-  async getTaxisByPlace(placeId: number) {
+  async getTaxisByPlace(placeId: number | string) {
+    const numericId = ensureNumericId(placeId);
     return this.prisma.taxi.findMany({
       where: {
         places: {
           some: {
-            id: placeId,
+            id: numericId,
           },
         },
       },

@@ -72,8 +72,19 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Verify deploy secrets
+        run: |
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "DEPLOY_HOST secret not set" && exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then
+            echo "DEPLOY_USER secret not set" && exit 1
+          fi
+          if [ -z "${{ secrets.DEPLOY_KEY }}" ]; then
+            echo "DEPLOY_KEY secret not set" && exit 1
+          fi
       - name: Deploy to production
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
@@ -83,4 +94,4 @@ jobs:
             git pull origin main
             npm ci
             npm run build
-            pm2 restart map 
+            pm2 restart map

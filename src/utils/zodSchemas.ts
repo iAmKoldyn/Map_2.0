@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+/**
+ * Common schema for validating numeric IDs passed via tRPC routes.
+ * Coerces the input to a number and ensures it is a positive integer.
+ */
+export const IdSchema = z.coerce
+  .number()
+  .int()
+  .positive()
+  .refine((val) => !Number.isNaN(val), {
+    message: 'ID must be a valid number',
+  });
+
 export const PlaceSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),

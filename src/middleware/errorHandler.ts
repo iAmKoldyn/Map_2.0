@@ -3,11 +3,11 @@ import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 
-export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
   console.error('Error:', {
     message: err.message,
     stack: err.stack,
-    code: (err as any).code,
+    code: (err as unknown as { [key: string]: unknown }).code,
     name: err.name,
   });
 
@@ -45,7 +45,7 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
   }
 
   // Handle other errors
-  const statusCode = (err as any).statusCode || 500;
+  const statusCode = (err as { statusCode?: number }).statusCode || 500;
   return res.status(statusCode).json({
     error: {
       code: 'INTERNAL_SERVER_ERROR',
