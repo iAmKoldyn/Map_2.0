@@ -27,6 +27,7 @@ export const requireRole = (role: UserRole) => {
 };
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: {

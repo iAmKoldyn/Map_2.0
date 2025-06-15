@@ -83,4 +83,4 @@ jobs:
             git pull origin main
             npm ci
             npm run build
-            pm2 restart map 
+            pm2 restart map

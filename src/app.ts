@@ -3,7 +3,6 @@ import cors from 'cors';
 import { createContext } from './trpc';
 import { appRouter } from './routers';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logging';
 import { ZodError } from 'zod';
