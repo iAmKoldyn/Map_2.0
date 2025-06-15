@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PlaceSchema } from '../utils/zodSchemas';
 import { z } from 'zod';
+import { ensureNumericId } from '../utils/ensureNumericId';
 
 export class PlaceService {
   constructor(private prisma: PrismaClient) {}
@@ -14,9 +15,10 @@ export class PlaceService {
     });
   }
 
-  async getPlaceById(id: number) {
+  async getPlaceById(id: number | string) {
+    const numericId = ensureNumericId(id);
     return this.prisma.place.findUnique({
-      where: { id },
+      where: { id: numericId },
       include: {
         reviews: true,
         taxis: true,
@@ -34,9 +36,10 @@ export class PlaceService {
     });
   }
 
-  async updatePlace(id: number, data: Partial<z.infer<typeof PlaceSchema>>) {
+  async updatePlace(id: number | string, data: Partial<z.infer<typeof PlaceSchema>>) {
+    const numericId = ensureNumericId(id);
     return this.prisma.place.update({
-      where: { id },
+      where: { id: numericId },
       data,
       include: {
         reviews: true,
@@ -45,9 +48,10 @@ export class PlaceService {
     });
   }
 
-  async deletePlace(id: number) {
+  async deletePlace(id: number | string) {
+    const numericId = ensureNumericId(id);
     return this.prisma.place.delete({
-      where: { id },
+      where: { id: numericId },
     });
   }
 

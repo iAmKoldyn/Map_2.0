@@ -35,7 +35,7 @@ async function main() {
     prisma.place.create({
       data: {
         name: 'Louvre Museum',
-        description: 'World\'s largest art museum',
+        description: "World's largest art museum",
         latitude: 48.8606,
         longitude: 2.3376,
         address: 'Rue de Rivoli',
@@ -51,7 +51,7 @@ async function main() {
   ]);
 
   // Create test taxis
-  const taxis = await Promise.all([
+  await Promise.all([
     prisma.taxi.create({
       data: {
         name: 'Paris Taxi Service',
@@ -60,7 +60,7 @@ async function main() {
         rating: 4.5,
         isAvailable: true,
         places: {
-          connect: places.map(place => ({ id: place.id })),
+          connect: places.map((place) => ({ id: place.id })),
         },
       },
     }),
@@ -72,7 +72,7 @@ async function main() {
         rating: 4.2,
         isAvailable: true,
         places: {
-          connect: places.map(place => ({ id: place.id })),
+          connect: places.map((place) => ({ id: place.id })),
         },
       },
     }),
@@ -110,17 +110,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-  }); 
-  ]);
-
-  console.log('Seed data created successfully!');
-}
-
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  }); 
+  });

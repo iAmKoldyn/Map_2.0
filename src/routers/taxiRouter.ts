@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { router, publicProcedure, middleware } from '../trpc';
-import { TaxiSchema } from '../utils/zodSchemas';
+import { TaxiSchema, IdSchema } from '../utils/zodSchemas';
 import { TaxiService } from '../services/taxiService';
-import { Context } from '../trpc';
 import { TRPCError } from '@trpc/server';
 
 const isAuthenticated = middleware(({ ctx, next }) => {
@@ -106,31 +105,29 @@ export const taxiRouter = router({
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  getById: publicProcedure
-    .input(z.object({ id: z.coerce.number() }))
-    .query(async ({ ctx, input }) => {
-      try {
-        const taxiService = new TaxiService(ctx.prisma);
-        const taxi = await taxiService.getTaxiById(input.id);
-        if (!taxi) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Taxi not found',
-          });
-        }
-        return taxi;
-      } catch (error) {
-        console.error('Error in taxi.getById:', error);
-        if (error instanceof TRPCError) {
-          throw error;
-        }
+  getById: publicProcedure.input(z.object({ id: IdSchema })).query(async ({ ctx, input }) => {
+    try {
+      const taxiService = new TaxiService(ctx.prisma);
+      const taxi = await taxiService.getTaxiById(input.id);
+      if (!taxi) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to fetch taxi',
-          cause: error,
+          code: 'NOT_FOUND',
+          message: 'Taxi not found',
         });
       }
-    }),
+      return taxi;
+    } catch (error) {
+      console.error('Error in taxi.getById:', error);
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to fetch taxi',
+        cause: error,
+      });
+    }
+  }),
 
   /**
    * @swagger
@@ -360,10 +357,10 @@ export const taxiRouter = router({
   delete: publicProcedure
     .use(isAuthenticated)
     .use(isAdmin)
-    .input(z.number())
+    .input(z.object({ id: IdSchema }))
     .mutation(async ({ ctx, input }) => {
       const taxiService = new TaxiService(ctx.prisma);
-      return taxiService.deleteTaxi(input);
+      return taxiService.deleteTaxi(input.id);
     }),
 
   search: publicProcedure

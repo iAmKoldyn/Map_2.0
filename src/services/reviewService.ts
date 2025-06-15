@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 import { ReviewSchema } from '../utils/zodSchemas';
+import { ensureNumericId } from '../utils/ensureNumericId';
 
 const prisma = new PrismaClient();
 
@@ -21,9 +21,10 @@ export class ReviewService {
     });
   }
 
-  async getReviewById(id: number) {
+  async getReviewById(id: number | string) {
+    const numericId = ensureNumericId(id);
     const review = await prisma.review.findUnique({
-      where: { id },
+      where: { id: numericId },
       include: {
         place: true,
         user: {
@@ -68,10 +69,11 @@ export class ReviewService {
     });
   }
 
-  async updateReview(id: number, data: Partial<typeof ReviewSchema._type>) {
+  async updateReview(id: number | string, data: Partial<typeof ReviewSchema._type>) {
+    const numericId = ensureNumericId(id);
     try {
       return prisma.review.update({
-        where: { id },
+        where: { id: numericId },
         data: {
           content: data.content,
           rating: data.rating,
@@ -98,10 +100,11 @@ export class ReviewService {
     }
   }
 
-  async deleteReview(id: number) {
+  async deleteReview(id: number | string) {
+    const numericId = ensureNumericId(id);
     try {
       return prisma.review.delete({
-        where: { id },
+        where: { id: numericId },
       });
     } catch (error) {
       throw new TRPCError({
@@ -111,9 +114,10 @@ export class ReviewService {
     }
   }
 
-  async getByPlace(placeId: number) {
+  async getByPlace(placeId: number | string) {
+    const numericId = ensureNumericId(placeId);
     return prisma.review.findMany({
-      where: { placeId },
+      where: { placeId: numericId },
       include: {
         place: true,
         user: {
@@ -127,9 +131,10 @@ export class ReviewService {
     });
   }
 
-  async getAverageRating(placeId: number) {
+  async getAverageRating(placeId: number | string) {
+    const numericId = ensureNumericId(placeId);
     const result = await prisma.review.aggregate({
-      where: { placeId },
+      where: { placeId: numericId },
       _avg: {
         rating: true,
       },

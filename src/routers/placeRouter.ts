@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, publicProcedure, middleware } from '../trpc';
-import { PlaceSchema } from '../utils/zodSchemas';
+import { PlaceSchema, IdSchema } from '../utils/zodSchemas';
 import { PlaceService } from '../services/placeService';
 import { TRPCError } from '@trpc/server';
 
@@ -96,71 +96,48 @@ export const placeRouter = router({
    *             schema:
    *               $ref: '#/components/schemas/Error'
    */
-  getById: publicProcedure
-    .input(
-      z.union([
-        z.number().int().positive(),
-        z.string().transform((val) => {
-          const num = Number(val);
-          if (isNaN(num)) throw new Error('ID must be a valid number');
-          return num;
-        }),
-        z
-          .object({
-            id: z.union([
-              z.number().int().positive(),
-              z.string().transform((val) => {
-                const num = Number(val);
-                if (isNaN(num)) throw new Error('ID must be a valid number');
-                return num;
-              }),
-            ]),
-          })
-          .transform((val) => val.id),
-      ])
-    )
-    .query(async ({ ctx, input }) => {
-      try {
-        console.log('getById input:', input);
+  getById: publicProcedure.input(z.object({ id: IdSchema })).query(async ({ ctx, input }) => {
+    try {
+      console.log('getById input:', input);
 
-        if (!input) {
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'ID is required',
-          });
-        }
-
-        const placeService = new PlaceService(ctx.prisma);
-        const place = await placeService.getPlaceById(input);
-
-        if (!place) {
-          console.log('Place not found for id:', input);
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'Place not found',
-          });
-        }
-
-        console.log('Found place:', place);
-        return place;
-      } catch (error) {
-        console.error('Error in getById:', {
-          error,
-          input,
-          stack: error instanceof Error ? error.stack : undefined,
-        });
-
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-
+      if (!input) {
         throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to get place',
-          cause: error,
+          code: 'BAD_REQUEST',
+          message: 'ID is required',
         });
       }
-    }),
+
+      const placeService = new PlaceService(ctx.prisma);
+      const place = await placeService.getPlaceById(input.id);
+
+      if (!place) {
+        console.log('Place not found for id:', input);
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Place not found',
+        });
+      }
+
+      console.log('Found place:', place);
+      return place;
+    } catch (error) {
+      console.error('Error in getById:', {
+        error,
+        input,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+
+      if (error instanceof TRPCError) {
+        throw error;
+      }
+
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to get place',
+        cause: error,
+      });
+    }
+  }),
 
   /**
    * @swagger
@@ -384,20 +361,12 @@ export const placeRouter = router({
   delete: publicProcedure
     .use(isAuthenticated)
     .use(isAdmin)
-    .input(
-      z
-        .number()
-        .int()
-        .positive()
-        .refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        })
-    )
+    .input(z.object({ id: IdSchema }))
     .mutation(async ({ ctx, input }) => {
       try {
         console.log('delete input:', input);
 
-        if (!input) {
+        if (!input.id) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'ID is required',
@@ -405,7 +374,7 @@ export const placeRouter = router({
         }
 
         const placeService = new PlaceService(ctx.prisma);
-        const place = await placeService.getPlaceById(input);
+        const place = await placeService.getPlaceById(input.id);
 
         if (!place) {
           console.log('Place not found for id:', input);
@@ -415,7 +384,7 @@ export const placeRouter = router({
           });
         }
 
-        return placeService.deletePlace(input);
+        return placeService.deletePlace(input.id);
       } catch (error) {
         console.error('Error in delete:', {
           error,
