@@ -98,26 +98,15 @@ export const placeRouter = router({
    */
   getById: publicProcedure
     .input(
-      z.union([
-        z.number().int().positive(),
-        z.string().transform((val) => {
-          const num = Number(val);
-          if (isNaN(num)) throw new Error('ID must be a valid number');
-          return num;
-        }),
-        z
-          .object({
-            id: z.union([
-              z.number().int().positive(),
-              z.string().transform((val) => {
-                const num = Number(val);
-                if (isNaN(num)) throw new Error('ID must be a valid number');
-                return num;
-              }),
-            ]),
-          })
-          .transform((val) => val.id),
-      ])
+      z.object({
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
+      })
     )
     .query(async ({ ctx, input }) => {
       try {
@@ -131,7 +120,7 @@ export const placeRouter = router({
         }
 
         const placeService = new PlaceService(ctx.prisma);
-        const place = await placeService.getPlaceById(input);
+        const place = await placeService.getPlaceById(input.id);
 
         if (!place) {
           console.log('Place not found for id:', input);
@@ -385,19 +374,21 @@ export const placeRouter = router({
     .use(isAuthenticated)
     .use(isAdmin)
     .input(
-      z
-        .number()
-        .int()
-        .positive()
-        .refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        })
+      z.object({
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
+      })
     )
     .mutation(async ({ ctx, input }) => {
       try {
         console.log('delete input:', input);
 
-        if (!input) {
+        if (!input.id) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'ID is required',
@@ -405,7 +396,7 @@ export const placeRouter = router({
         }
 
         const placeService = new PlaceService(ctx.prisma);
-        const place = await placeService.getPlaceById(input);
+        const place = await placeService.getPlaceById(input.id);
 
         if (!place) {
           console.log('Place not found for id:', input);
@@ -415,7 +406,7 @@ export const placeRouter = router({
           });
         }
 
-        return placeService.deletePlace(input);
+        return placeService.deletePlace(input.id);
       } catch (error) {
         console.error('Error in delete:', {
           error,

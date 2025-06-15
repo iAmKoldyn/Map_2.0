@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { router, publicProcedure, middleware } from '../trpc';
 import { ReviewSchema } from '../utils/zodSchemas';
 import { ReviewService } from '../services/reviewService';
-import { Context } from '../trpc';
 import { TRPCError } from '@trpc/server';
 
 const reviewService = new ReviewService();
@@ -154,26 +153,28 @@ export const reviewRouter = router({
   delete: publicProcedure
     .use(isAuthenticated)
     .input(
-      z
-        .number()
-        .int()
-        .positive()
-        .refine((val) => !isNaN(val), {
-          message: 'ID must be a valid number',
-        })
+      z.object({
+        id: z.coerce
+          .number()
+          .int()
+          .positive()
+          .refine((val) => !isNaN(val), {
+            message: 'ID must be a valid number',
+          }),
+      })
     )
     .mutation(async ({ input }) => {
       try {
         console.log('delete input:', input);
 
-        if (!input) {
+        if (!input.id) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'ID is required',
           });
         }
 
-        const review = await reviewService.getReviewById(input);
+        const review = await reviewService.getReviewById(input.id);
 
         if (!review) {
           console.log('Review not found for id:', input);
@@ -183,7 +184,7 @@ export const reviewRouter = router({
           });
         }
 
-        return await reviewService.deleteReview(input);
+        return await reviewService.deleteReview(input.id);
       } catch (error) {
         console.error('Error in delete:', {
           error,
